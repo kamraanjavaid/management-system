@@ -9,8 +9,8 @@ const Sidebar = () => {
           <Box className="text-white h-6 w-6" />
         </div>
         <div>
-          <h1 className="text-white font-bold leading-none">MobileHub</h1>
-          <span className="text-xs text-slate-500">Shop Manager</span>
+          <h1 className="text-white font-bold leading-none">Orby MobileHub</h1>
+          <span className="text-xs text-slate-500">Management System</span>
         </div>
       </div>
 
@@ -47,7 +47,7 @@ const Sidebar = () => {
         <div className="flex items-center gap-3 px-2">
           <div className="h-10 w-10 rounded-full bg-cyan-500 flex items-center justify-center text-white font-bold">JD</div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-white">John Doe</p>
+            <p className="text-sm font-medium text-white">Kamran Javaid</p>
             <p className="text-xs text-slate-500">Store Manager</p>
           </div>
           <Bell size={18} className="text-slate-500 hover:text-white cursor-pointer" />
