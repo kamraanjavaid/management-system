@@ -1,6 +1,12 @@
-import { LayoutDashboard, Box, ShoppingCart, Settings, TrendingUp, Bell } from "lucide-react";
+"use client";
+
+import { LayoutDashboard, Box, ShoppingCart, Settings, TrendingUp, Bell, Home, BarChart3 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const Sidebar = () => {
+  const pathname = usePathname();
+
   return (
     <aside className="w-64 bg-[#0F172A] text-slate-300 flex flex-col">
       {/* Logo Section */}
@@ -19,16 +25,36 @@ const Sidebar = () => {
         <div>
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-4 px-2">Main</p>
           <ul className="space-y-2">
-            <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" active />
-            <NavItem icon={<Box size={20} />} label="Inventory" />
-            <NavItem icon={<ShoppingCart size={20} />} label="Sales & Orders" />
+            <NavItem 
+              href="/dashboard/home" 
+              icon={<Home size={20} />} 
+              label="Home" 
+              active={pathname === '/dashboard/home'} 
+            />
+            <NavItem 
+              href="/dashboard/sales" 
+              icon={<BarChart3 size={20} />} 
+              label="Sales" 
+              active={pathname === '/dashboard/sales'} 
+            />
+            <NavItem 
+              href="/dashboard/inventory" 
+              icon={<Box size={20} />} 
+              label="Inventory" 
+              active={pathname === '/dashboard/inventory'} 
+            />
           </ul>
         </div>
         
         <div>
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-4 px-2">System</p>
           <ul className="space-y-2">
-            <NavItem icon={<Settings size={20} />} label="Settings" />
+            <NavItem 
+              href="/dashboard/settings" 
+              icon={<Settings size={20} />} 
+              label="Settings" 
+              active={pathname === '/dashboard/settings'} 
+            />
           </ul>
         </div>
       </nav>
@@ -58,10 +84,17 @@ const Sidebar = () => {
 };
 
 // Helper Sub-component
-const NavItem = ({ icon, label, active = false }: { icon: any, label: string, active?: boolean }) => (
-  <li className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors ${active ? 'bg-blue-600 text-white' : 'hover:bg-slate-800'}`}>
-    {icon}
-    <span className="text-sm font-medium">{label}</span>
+const NavItem = ({ href, icon, label, active = false }: { href: string, icon: any, label: string, active?: boolean }) => (
+  <li>
+    <Link 
+      href={href}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors ${
+        active ? 'bg-blue-600 text-white' : 'hover:bg-slate-800'
+      }`}
+    >
+      {icon}
+      <span className="text-sm font-medium">{label}</span>
+    </Link>
   </li>
 );
 
