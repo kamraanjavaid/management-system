@@ -33,23 +33,29 @@ export class SupabaseService {
 
   async testConnection(): Promise<{ connected: boolean; message: string }> {
     try {
-      // Test with a simple query
+      // Test with a simple query on inventory table
       const { error } = await this.adminSupabase
-        .from('auth.users')
+        .from('inventory')
         .select('id')
         .limit(1);
 
       if (error) {
-        // If that fails, try a basic connection test
-        const { error: healthError } = await this.adminSupabase
-          .rpc('version');
-
-        if (healthError) {
+        // If inventory table doesn't exist, try a different approach
+        // Check if we can at least get auth metadata
+        const { data: authData, error: authError } = await this.adminSupabase.auth.getUser();
+        
+        if (authError) {
           return {
             connected: false,
-            message: `Connection failed: ${healthError.message}`,
+            message: `Connection failed: ${authError.message}`,
           };
         }
+        
+        // Auth works, database might not have inventory table yet
+        return {
+          connected: true,
+          message: 'Supabase connected (inventory table not created yet)',
+        };
       }
 
       return {

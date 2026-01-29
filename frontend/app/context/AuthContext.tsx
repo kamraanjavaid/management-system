@@ -8,6 +8,8 @@ export interface UserProfile {
   id: string;
   email: string;
   full_name: string;
+  shop: string;
+  shop_id: string;
 }
 
 interface AuthContextType {
@@ -136,12 +138,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("user", JSON.stringify(responseData.data.user));
       setUser(responseData.data.user);
 
-      // Redirect based on role
-      if (responseData.data.user.role === "staff") {
-        router.push("/dashboard/sales");
-      } else {
-        router.push("/dashboard/home");
-      }
+      // Single admin user flow: always go to dashboard home
+      router.push("/dashboard/home");
 
       return { success: true, message: "Login successful" };
     } catch (error) {

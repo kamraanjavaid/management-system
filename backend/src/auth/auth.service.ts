@@ -5,7 +5,6 @@ import { SupabaseService } from '../supabase/supabase.service';
 export interface UserProfile {
   id: string;
   email: string;
-  role: 'admin' | 'staff';
   shop: string;
   shop_id: string;
   full_name: string;
@@ -41,7 +40,6 @@ export class AuthService {
       const profile: UserProfile = {
         id: user.id,
         email: user.email || '',
-        role: metadata.role || 'staff',
         shop: metadata.shop || 'Main Store',
         shop_id: metadata.shop_id || 'main-store',
         full_name: metadata.full_name || user.email?.split('@')[0] || 'User',
@@ -67,7 +65,6 @@ export class AuthService {
         return {
           id: payload.sub,
           email: payload.email,
-          role: payload.role,
           shop: payload.shop,
           shop_id: payload.shop_id,
           full_name: payload.full_name,
@@ -93,7 +90,6 @@ export class AuthService {
       return {
         id: user.id,
         email: user.email || '',
-        role: metadata.role || 'staff',
         shop: metadata.shop || 'Main Store',
         shop_id: metadata.shop_id || 'main-store',
         full_name: metadata.full_name || user.email?.split('@')[0] || 'User',
@@ -111,7 +107,6 @@ export class AuthService {
     const payload = {
       sub: userProfile.id,
       email: userProfile.email,
-      role: userProfile.role,
       shop: userProfile.shop,
       shop_id: userProfile.shop_id,
       full_name: userProfile.full_name,
