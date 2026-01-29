@@ -1,35 +1,49 @@
-import AddStockForm from "@/app/components/dashboard/inventory/AddStockForm"; 
-import InventoryTable from "@/app/components/dashboard/inventory/InventoryTable"; 
-import ProtectedRoute from "@/app/components/auth/ProtectedRoute";
+'use client';
+import { useState } from 'react';
+import InventoryTable from '@/app/components/dashboard/inventory/InventoryTable';
+import AddProductModal from '@/app/components/dashboard/inventory/AddProductModal';
+import ProtectedRoute from '@/app/components/auth/ProtectedRoute';
 
 export default function InventoryPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <ProtectedRoute>
-      <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-        {/* Header Section */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Inventory Management</h1>
-            <p className="text-gray-500">Manage mobiles and accessories in one place.</p>
-          </div>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-            Export Inventory (CSV)
-          </button>
+      <div className="p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Inventory</h1>
+          <p className="text-sm text-gray-500">Manage your mobiles and accessories</p>
         </div>
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
+        >
+          + Add New Product
+        </button>
+      </div>
 
-        {/* Bottom Row: Action and List */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column: Input Form (1 part) */}
-          <div className="lg:col-span-1">
-            <AddStockForm /> 
-          </div>
-
-          {/* Right Column: Detailed Data Table (2 parts) */}
-          <div className="lg:col-span-2">
-            <InventoryTable />
-          </div>
+      {/* Stats Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 bg-white border rounded-xl shadow-sm">
+          <p className="text-sm text-gray-500">Total Items</p>
+          <p className="text-2xl font-bold">1,240</p>
+        </div>
+        <div className="p-4 bg-white border rounded-xl shadow-sm">
+          <p className="text-sm text-gray-500">Low Stock Alerts</p>
+          <p className="text-2xl font-bold text-red-500">12</p>
+        </div>
+        <div className="p-4 bg-white border rounded-xl shadow-sm">
+          <p className="text-sm text-gray-500">Inventory Value</p>
+          <p className="text-2xl font-bold text-green-600">$45,200</p>
         </div>
       </div>
+
+      <InventoryTable />
+      
+      {isModalOpen && <AddProductModal onClose={() => setIsModalOpen(false)} />}
+    </div>
     </ProtectedRoute>
+    
   );
 }

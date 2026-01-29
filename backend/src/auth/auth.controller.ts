@@ -2,6 +2,11 @@ import { Controller, Get, Post, Body, UseGuards, Request, HttpCode, HttpStatus }
 import { AuthService, UserProfile } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
+export class LoginDto {
+  email: string;
+  password: string;
+}
+
 export class TokenLoginDto {
   access_token: string;
 }
@@ -23,6 +28,41 @@ export class MeResponseDto {
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  /**
+   * Login endpoint - authenticate with email/password
+   * POST /auth/login
+   */
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
+    const { email, password } = loginDto;
+
+    if (!email || !password) {
+      return {
+        success: false,
+        message: 'Email and password are required',
+      };
+    }
+
+    const session = await this.authService.signInWithPassword(email, password);
+
+    if (!session) {
+      return {
+        success: false,
+        message: 'Invalid credentials',
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Login successful',
+      data: {
+        user: session.profile,
+        token: session.token,
+      },
+    };
+  }
 
   /**
    * Token login endpoint - exchange Supabase token for session

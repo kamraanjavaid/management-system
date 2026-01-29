@@ -33,31 +33,72 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const storedToken = localStorage.getItem("auth_token");
         const storedUser = localStorage.getItem("user");
 
-        if (storedToken && storedUser) {
-          // Verify token with backend
-          const response = await fetch(`${API_URL}/auth/me`, {
-            headers: {
-              Authorization: `Bearer ${storedToken}`,
-            },
-          });
+        console.log("Auth init - Token exists:", !!storedToken);
+        console.log("Auth init - User exists:", !!storedUser);
 
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.data) {
-              setUser(data.data);
+        if (storedToken && storedUser) {
+          try {
+            // Verify token with backend using the verify endpoint
+            const response = await fetch(`${API_URL}/auth/verify`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${storedToken}`,
+                "Content-Type": "application/json",
+              },
+              credentials: "include", // Include cookies if any
+            });
+
+            console.log("Auth verification response status:", response.status);
+
+            if (response.ok) {
+              const data = await response.json();
+              console.log("Auth verification data:", data);
+              
+              if (data.valid && data.user) {
+                setUser(data.user);
+                console.log("User authenticated successfully");
+              } else {
+                console.log("Token invalid, clearing storage");
+                localStorage.removeItem("auth_token");
+                localStorage.removeItem("user");
+                setUser(null);
+              }
             } else {
-              // Token invalid, clear storage
-              localStorage.removeItem("auth_token");
-              localStorage.removeItem("user");
+              console.log("Token verification failed with status:", response.status);
+              if (response.status === 401 || response.status === 403) {
+                // Unauthorized or forbidden - clear token
+                localStorage.removeItem("auth_token");
+                localStorage.removeItem("user");
+                setUser(null);
+              } else {
+                // Network error or server error - use cached user for now
+                try {
+                  const storedUserData = JSON.parse(storedUser);
+                  setUser(storedUserData);
+                  console.log("Using cached user data due to verification error");
+                } catch {
+                  setUser(null);
+                }
+              }
             }
-          } else {
-            // Token invalid, clear storage
-            localStorage.removeItem("auth_token");
-            localStorage.removeItem("user");
+          } catch (fetchError) {
+            console.error("Auth verification fetch error:", fetchError);
+            // Network error - use cached user data
+            try {
+              const storedUserData = JSON.parse(storedUser);
+              setUser(storedUserData);
+              console.log("Using cached user data after fetch error");
+            } catch {
+              setUser(null);
+            }
           }
+        } else {
+          console.log("No stored auth data found");
+          setUser(null);
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -68,28 +109,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      // Sign in with Supabase
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        return { success: false, message: error.message };
-      }
-
-      if (!data.session?.access_token) {
-        return { success: false, message: "No session token received" };
-      }
-
-      // Exchange Supabase token for session token with backend
-      const response = await fetch(`${API_URL}/auth/token-login`, {
+      // Direct login with backend
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          access_token: data.session.access_token,
+          email,
+          password,
         }),
       });
 
@@ -124,14 +152,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
+      // Clear local storage and state
       localStorage.removeItem("auth_token");
       localStorage.removeItem("user");
       setUser(null);
       router.push("/");
+    } catch (error) {
+      console.error("Logout error:", error);
     }
   };
 

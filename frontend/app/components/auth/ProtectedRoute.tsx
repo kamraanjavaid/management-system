@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 
@@ -13,18 +13,23 @@ export default function ProtectedRoute({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [isAuthResolved, setIsAuthResolved] = useState(false);
 
   useEffect(() => {
-    if (loading) return;
-
-    if (requireAuth && !user) {
-      // Not authenticated, redirect to login
-      router.push("/");
-      return;
+    // Only proceed once loading is complete
+    if (!loading) {
+      if (requireAuth && !user) {
+        // Not authenticated, redirect to login
+        router.push("/");
+      } else {
+        // Auth check is done
+        setIsAuthResolved(true);
+      }
     }
   }, [user, loading, router, requireAuth]);
 
-  if (loading) {
+  // Show loading state while auth is being checked
+  if (loading || !isAuthResolved) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>

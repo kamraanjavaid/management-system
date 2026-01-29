@@ -5,6 +5,9 @@ import { SupabaseService } from '../supabase/supabase.service';
 export interface UserProfile {
   id: string;
   email: string;
+  role: 'admin' | 'staff';
+  shop: string;
+  shop_id: string;
   full_name: string;
 }
 
@@ -14,6 +17,44 @@ export class AuthService {
     private jwtService: JwtService,
     private supabaseService: SupabaseService,
   ) {}
+
+  /**
+   * Sign in with email and password using Supabase Auth
+   */
+  async signInWithPassword(email: string, password: string): Promise<{ profile: UserProfile; token: string } | null> {
+    try {
+      const { data, error } = await this.supabaseService
+        .getClient()
+        .auth.signInWithPassword({
+          email,
+          password,
+        });
+
+      if (error || !data?.user) {
+        console.error('Login failed:', error?.message);
+        return null;
+      }
+
+      const user = data.user;
+      const metadata = user.user_metadata || {};
+      
+      const profile: UserProfile = {
+        id: user.id,
+        email: user.email || '',
+        role: metadata.role || 'staff',
+        shop: metadata.shop || 'Main Store',
+        shop_id: metadata.shop_id || 'main-store',
+        full_name: metadata.full_name || user.email?.split('@')[0] || 'User',
+      };
+
+      const token = this.generateSessionToken(profile);
+      
+      return { profile, token };
+    } catch (error) {
+      console.error('Error during sign in:', error);
+      return null;
+    }
+  }
 
   /**
    * Verify Supabase session token and return user profile
@@ -26,6 +67,9 @@ export class AuthService {
         return {
           id: payload.sub,
           email: payload.email,
+          role: payload.role,
+          shop: payload.shop,
+          shop_id: payload.shop_id,
           full_name: payload.full_name,
         };
       } catch (jwtError) {
@@ -49,6 +93,9 @@ export class AuthService {
       return {
         id: user.id,
         email: user.email || '',
+        role: metadata.role || 'staff',
+        shop: metadata.shop || 'Main Store',
+        shop_id: metadata.shop_id || 'main-store',
         full_name: metadata.full_name || user.email?.split('@')[0] || 'User',
       };
     } catch (error) {
@@ -64,6 +111,9 @@ export class AuthService {
     const payload = {
       sub: userProfile.id,
       email: userProfile.email,
+      role: userProfile.role,
+      shop: userProfile.shop,
+      shop_id: userProfile.shop_id,
       full_name: userProfile.full_name,
     };
 
