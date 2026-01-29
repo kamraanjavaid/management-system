@@ -1,11 +1,17 @@
 "use client";
 
-import { LayoutDashboard, Box, ShoppingCart, Settings, TrendingUp, Bell, Home, BarChart3 } from "lucide-react";
+import { Box, ShoppingCart, Settings, TrendingUp, Bell, Home, BarChart3, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/app/context/AuthContext";
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   return (
     <aside className="w-64 bg-[#0F172A] text-slate-300 flex flex-col">
@@ -71,12 +77,20 @@ const Sidebar = () => {
         </div>
         
         <div className="flex items-center gap-3 px-2">
-          <div className="h-10 w-10 rounded-full bg-cyan-500 flex items-center justify-center text-white font-bold">JD</div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-white">Kamran Javaid</p>
-            <p className="text-xs text-slate-500">Store Manager</p>
+          <div className="h-10 w-10 rounded-full bg-cyan-500 flex items-center justify-center text-white font-bold">
+            {user?.full_name?.charAt(0).toUpperCase() || 'U'}
           </div>
-          <Bell size={18} className="text-slate-500 hover:text-white cursor-pointer" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-white">{user?.full_name || 'User'}</p>
+            <p className="text-xs text-slate-500">Admin</p>
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="p-2 text-slate-500 hover:text-white transition-colors"
+            title="Logout"
+          >
+            <LogOut size={18} />
+          </button>
         </div>
       </div>
     </aside>
