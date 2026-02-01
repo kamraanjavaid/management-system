@@ -129,24 +129,22 @@ export default function ProductModal({ onClose, onSuccess, onProductAdded, initi
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Stock</label>
                 <input
-                  type="number"
+                  type="text"
                   name="stock"
                   value={formData.stock}
                   onChange={handleChange}
                   required
-                  min="0"
                   className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Sale Price</label>
                 <input
-                  type="number"
+                  type="text"
                   name="sale_price"
                   value={formData.sale_price}
                   onChange={handleChange}
                   required
-                  min="0"
                   step="0.01"
                   className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-green-600 font-bold"
                 />
@@ -156,12 +154,11 @@ export default function ProductModal({ onClose, onSuccess, onProductAdded, initi
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Cost Price</label>
               <input
-                type="number"
+                type="text"
                 name="cost_price"
                 value={formData.cost_price}
                 onChange={handleChange}
                 required
-                min="0"
                 step="0.01"
                 className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />

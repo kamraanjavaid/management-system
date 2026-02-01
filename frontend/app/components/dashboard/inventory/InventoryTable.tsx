@@ -77,8 +77,8 @@ const InventoryTable = forwardRef<InventoryTableRef>((props, ref) => {
                   {item.stock}
                 </span>
               </td>
-              <td className="p-4 text-right font-semibold">${item.cost_price}</td>
-              <td className="p-4 text-right font-semibold text-blue-600">${item.sale_price}</td>
+              <td className="p-4 text-right font-semibold">{item.cost_price}</td>
+              <td className="p-4 text-right font-semibold text-blue-600">{item.sale_price}</td>
               <td className="p-4 text-right">
                 <div className="flex justify-end gap-2">
                   <button 
