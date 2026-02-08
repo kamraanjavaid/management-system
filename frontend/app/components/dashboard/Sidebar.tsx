@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, ShoppingCart, Settings, TrendingUp, Bell, Home, BarChart3, LogOut } from "lucide-react";
+import { Box, ShoppingCart, Settings, TrendingUp, Bell, Home, BarChart3, LogOut, CircleUser } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
@@ -48,6 +48,12 @@ const Sidebar = () => {
               icon={<Box size={20} />} 
               label="Inventory" 
               active={pathname === '/dashboard/inventory'} 
+            />
+             <NavItem 
+              href="/dashboard/customers" 
+              icon={<CircleUser size={20} />} 
+              label="Customers" 
+              active={pathname === '/dashboard/customers'} 
             />
           </ul>
         </div>

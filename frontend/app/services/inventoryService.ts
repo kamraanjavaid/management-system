@@ -33,7 +33,7 @@ class InventoryService {
   }
 
   async getAllProducts(): Promise<Product[]> {
-    const response = await fetch(`${API_URL}/inventory`, {
+    const response = await fetch(`${API_URL}/api/inventory`, {
       headers: this.getAuthHeaders(),
     });
     
@@ -45,7 +45,7 @@ class InventoryService {
   }
 
   async getProduct(id: string): Promise<Product> {
-    const response = await fetch(`${API_URL}/inventory/${id}`, {
+    const response = await fetch(`${API_URL}/api/inventory/${id}`, {
       headers: this.getAuthHeaders(),
     });
     
@@ -57,7 +57,7 @@ class InventoryService {
   }
 
   async createProduct(product: CreateProductDto): Promise<Product> {
-    const response = await fetch(`${API_URL}/inventory`, {
+    const response = await fetch(`${API_URL}/api/inventory`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(product),
@@ -71,7 +71,7 @@ class InventoryService {
   }
 
   async updateProduct(id: string, product: UpdateProductDto): Promise<Product> {
-    const response = await fetch(`${API_URL}/inventory/${id}`, {
+    const response = await fetch(`${API_URL}/api/inventory/${id}`, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(product),
@@ -85,7 +85,7 @@ class InventoryService {
   }
 
   async deleteProduct(id: string): Promise<void> {
-    const response = await fetch(`${API_URL}/inventory/${id}`, {
+    const response = await fetch(`${API_URL}/api/inventory/${id}`, {
       method: 'DELETE',
       headers: this.getAuthHeaders(),
     });
@@ -96,7 +96,7 @@ class InventoryService {
   }
 
   async updateStock(id: string, change: number): Promise<Product> {
-    const response = await fetch(`${API_URL}/inventory/${id}/stock`, {
+    const response = await fetch(`${API_URL}/api/inventory/${id}/stock`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ change }),
