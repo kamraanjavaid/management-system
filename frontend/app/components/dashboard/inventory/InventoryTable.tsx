@@ -4,6 +4,7 @@ import { inventoryService, Product } from '@/app/services/inventoryService';
 import { Pencil, Trash2 } from 'lucide-react';
 import DeleteModal from '@/app/components/models/deleteModal';
 import ProductModal from './productModal'; // Rename your add modal to this
+import Loading from '@/app/loader';
 
 interface InventoryTableRef {
   loadProducts: () => void;
@@ -43,7 +44,7 @@ const InventoryTable = forwardRef<InventoryTableRef>((props, ref) => {
     setProducts(products.filter(p => p.id !== id));
   };
 
-  if (loading) return <div className="p-8 text-center animate-pulse">Loading...</div>;
+  if (loading) return <div className="p-8 text-center animate-pulse"><Loading/></div>;
 
   return (
     <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
