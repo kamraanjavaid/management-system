@@ -1,16 +1,68 @@
 import { DollarSign, ShoppingCart, Package, AlertTriangle, TrendingUp } from "lucide-react";
-
-const stats = [
-  { label: "Total Revenue", value: "$4,359.20", trend: "+12.5%", icon: <DollarSign className="text-emerald-600" />, bgColor: "bg-emerald-50" },
-  { label: "Total Orders", value: "6", trend: "+8.2%", icon: <ShoppingCart className="text-blue-600" />, bgColor: "bg-blue-50" },
-  { label: "Products", value: "10", icon: <Package className="text-cyan-600" />, bgColor: "bg-cyan-50" },
-  { label: "Low Stock", value: "2", icon: <AlertTriangle className="text-amber-600" />, bgColor: "bg-amber-50" },
-];
+import { inventoryService } from "@/app/services/inventoryService";
+import { useState, useEffect } from "react";
 
 export default function StatCards() {
+  const [data, setData] = useState({
+    totalItems: 0,
+    lowStockAlerts: 0,
+    inventoryValue: 0,
+  });
+
+  const loadStats = async () => {
+    try {
+      const products = await inventoryService.getAllProducts();
+      const totalItems = products.reduce((sum, p) => sum + (p.stock || 0), 0);
+      const lowStockAlerts = products.filter(p => p.stock < 10).length;
+      const inventoryValue = products.reduce((sum, p) => sum + ((p.cost_price || 0) * (p.stock || 0)), 0);
+
+      setData({
+        totalItems,
+        lowStockAlerts,
+        inventoryValue,
+      });
+    } catch (error) {
+      console.error('Failed to load stats:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  // Here we combine your real calculated data with your dummy revenue/order data
+  const statsConfig = [
+    { 
+      label: "Total Revenue", 
+      value: "$4,359.20", // Dummy
+      trend: "+12.5%", 
+      icon: <DollarSign className="text-emerald-600" />, 
+      bgColor: "bg-emerald-50" 
+    },
+    { 
+      label: "Total Orders", 
+      value: "154", // Dummy
+      trend: "+8.2%", 
+      icon: <ShoppingCart className="text-blue-600" />, 
+      bgColor: "bg-blue-50" 
+    },
+    { 
+      label: "Inventory Value", 
+      value: `${data.inventoryValue.toLocaleString()} PKR`, // Real
+      icon: <Package className="text-cyan-600" />, 
+      bgColor: "bg-cyan-50" 
+    },
+    { 
+      label: "Low Stock", 
+      value: data.lowStockAlerts.toString(), // Real
+      icon: <AlertTriangle className="text-amber-600" />, 
+      bgColor: "bg-amber-50" 
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-      {stats.map((stat, i) => (
+      {statsConfig.map((stat, i) => (
         <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-start">
           <div>
             <p className="text-sm text-slate-500 font-medium">{stat.label}</p>
