@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 export interface Product {
   id: string;
@@ -10,25 +12,6 @@ export interface Product {
   cost_price: number;
   sale_price: number;
   created_at: string;
-}
-
-export class CreateProductDto {
-  name: string;
-  brand?: string;
-  category: string;
-  stock: number;
-  cost_price: number;
-  sale_price: number;
-  total_stock_cost?: number;
-}
-
-export class UpdateProductDto {
-  name?: string;
-  brand?: string;
-  category?: string;
-  stock?: number;
-  cost_price?: number;
-  sale_price?: number;
 }
 
 @Injectable()
