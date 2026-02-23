@@ -17,7 +17,7 @@ class SaleItemDto {
 export class CreateSaleDto {
   @IsString() @IsOptional() customerName?: string;
   @IsString() @IsOptional() customerPhone?: string;
-  @IsString() @IsNotEmpty() imei: string;
+  @IsString() @IsOptional() imei: string;
   @IsNumber() finalPrice: number;
   @IsString() @IsOptional() notes?: string;
 

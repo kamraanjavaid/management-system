@@ -3,7 +3,7 @@ CREATE TABLE sales (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   customer_name TEXT,
   customer_phone TEXT,
-  imei TEXT NOT NULL,
+  imei TEXT,
   final_settled_price DECIMAL(10, 2) NOT NULL,
   notes TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
