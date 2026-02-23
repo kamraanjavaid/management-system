@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { inventoryService, CreateProductDto, Product } from '@/app/services/inventoryService';
+import { inventoryService } from '@/app/services/inventoryService';
+import { CreateProductDto } from '@/app/types/inventory-types';
+import { Product } from '@/app/types/inventory-types';
 
 interface ProductModalProps {
   onClose: () => void;
