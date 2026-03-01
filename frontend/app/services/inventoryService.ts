@@ -1,31 +1,10 @@
+import { Product, CreateProductDto, UpdateProductDto } from '../types/inventory-types';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-
-export interface Product {
-  id: string;
-  name: string;
-  brand: string;
-  category: string;
-  stock: number;
-  cost_price: number;
-  sale_price: number;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface CreateProductDto {
-  name: string;
-  brand: string;
-  category: string;
-  stock: number;
-  cost_price: number;
-  sale_price: number;
-}
-
-export interface UpdateProductDto extends Partial<CreateProductDto> {}
 
 class InventoryService {
   private getAuthHeaders() {
-    const token = localStorage.getItem('auth_token');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
     return {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
@@ -37,10 +16,7 @@ class InventoryService {
       headers: this.getAuthHeaders(),
     });
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch products');
-    }
-    
+    if (!response.ok) throw new Error('Failed to fetch products');
     return response.json();
   }
 
@@ -49,10 +25,7 @@ class InventoryService {
       headers: this.getAuthHeaders(),
     });
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch product');
-    }
-    
+    if (!response.ok) throw new Error('Failed to fetch product');
     return response.json();
   }
 
@@ -63,10 +36,7 @@ class InventoryService {
       body: JSON.stringify(product),
     });
     
-    if (!response.ok) {
-      throw new Error('Failed to create product');
-    }
-    
+    if (!response.ok) throw new Error('Failed to create product');
     return response.json();
   }
 
@@ -77,10 +47,7 @@ class InventoryService {
       body: JSON.stringify(product),
     });
     
-    if (!response.ok) {
-      throw new Error('Failed to update product');
-    }
-    
+    if (!response.ok) throw new Error('Failed to update product');
     return response.json();
   }
 
@@ -90,9 +57,7 @@ class InventoryService {
       headers: this.getAuthHeaders(),
     });
     
-    if (!response.ok) {
-      throw new Error('Failed to delete product');
-    }
+    if (!response.ok) throw new Error('Failed to delete product');
   }
 
   async updateStock(id: string, change: number): Promise<Product> {
@@ -102,10 +67,7 @@ class InventoryService {
       body: JSON.stringify({ change }),
     });
     
-    if (!response.ok) {
-      throw new Error('Failed to update stock');
-    }
-    
+    if (!response.ok) throw new Error('Failed to update stock');
     return response.json();
   }
 }
