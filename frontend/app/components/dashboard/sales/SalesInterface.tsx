@@ -1,9 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, ChangeEvent } from "react";
-import { Send, Check, Eye, X, DollarSign, MessageSquare } from "lucide-react";
-import { inventoryService, Product } from "@/app/services/inventoryService";
-import ProductSelector from "./ProductSelector"; // Import the new component
+import { Send, Check, Eye, DollarSign, MessageSquare } from "lucide-react";
+import { inventoryService } from "@/app/services/inventoryService";
+import { salesService } from "@/app/services/salesService";
+import { Product } from "@/app/types/inventory-types";
+import { CreateSaleDto } from "@/app/types/sales-types";
+import ProductSelector from "./ProductSelector";
+import DigitalReceipt from "@/app/components/dashboard/sales/DigitalReceipt";
 
 interface SaleState {
   customerName: string;
@@ -12,6 +16,7 @@ interface SaleState {
   finalPrice: string;
   notes: string;
   date: string;
+  receiptNo?: string;
 }
 
 export default function SalesInterface() {
@@ -21,6 +26,7 @@ export default function SalesInterface() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
   const [saleData, setSaleData] = useState<SaleState>({
     customerName: "",
@@ -29,6 +35,7 @@ export default function SalesInterface() {
     finalPrice: "",
     notes: "",
     date: new Date().toLocaleDateString(),
+    receiptNo: undefined,
   });
 
   const loadProducts = async () => {
@@ -62,7 +69,40 @@ export default function SalesInterface() {
     setSaleData(prev => ({ ...prev, [name]: value }));
   };
 
-  // ... (generateWhatsAppLink and DigitalReceipt functions remain the same) ...
+  const handleCompleteSale = async () => {
+    try {
+      setSubmitting(true);
+      setError(null);
+
+      const salePayload: CreateSaleDto = {
+        customerName: saleData.customerName || undefined,
+        customerPhone: saleData.customerPhone || undefined,
+        imei: saleData.imei,
+        finalPrice: parseFloat(saleData.finalPrice),
+        notes: saleData.notes || undefined,
+        items: selectedItems.map(item => ({
+          productId: item.id,
+          name: item.name,
+          price: Number(item.sale_price)
+        }))
+      };
+
+      const created = await salesService.createSale(salePayload);
+      // store receipt number returned by backend
+      setSaleData(s => ({
+        ...s,
+        receiptNo: created.id,
+        date: created.created_at ? new Date(created.created_at).toLocaleDateString() : s.date,
+      }));
+      setStep(3);
+    } catch (err: any) {
+      setError(err.message || "Failed to create sale");
+      alert("Error creating sale: " + (err.message || "Unknown error"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const generateWhatsAppLink = (): void => {
     const itemsList = selectedItems.map(i => `- ${i.name}`).join('%0A');
     const noteSection = saleData.notes ? `%0A*Note:* ${saleData.notes}` : "";
@@ -70,39 +110,15 @@ export default function SalesInterface() {
     window.open(`https://wa.me/${saleData.customerPhone}?text=${message}`, "_blank");
   };
 
-  // Receipt Component (Updated to use item.sale_price)
-  const DigitalReceipt = () => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
-        <div className="mb-4 flex justify-between">
-          <h3 className="text-lg font-bold text-gray-900">Digital Receipt</h3>
-          <button onClick={() => setShowReceipt(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
-        </div>
-        <div className="space-y-3 border-y border-dashed border-gray-200 py-4 font-mono text-sm">
-          <div className="flex justify-between text-gray-600"><span>Date:</span> <span>{saleData.date}</span></div>
-          <div className="flex justify-between text-gray-600"><span>Customer:</span> <span>{saleData.customerName || "Walk-in"}</span></div>
-          <hr className="border-dashed border-gray-200" />
-          {selectedItems.map((item) => (
-            <div key={item.id} className="flex justify-between text-gray-900">
-              <span>{item.name}</span>
-              <span>${item.sale_price}</span>
-            </div>
-          ))}
-          <hr className="border-dashed border-gray-200" />
-          <div className="flex justify-between text-lg font-bold text-blue-600">
-            <span>TOTAL PAID</span>
-            <span>${saleData.finalPrice}</span>
-          </div>
-        </div>
-        <button onClick={() => window.print()} className="mt-6 w-full rounded-xl bg-blue-600 py-3 text-sm font-bold text-white transition hover:bg-blue-700">
-          Print Receipt
-        </button>
-      </div>
-    </div>
-  );
   return (
     <div className="mx-auto max-w-2xl overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl">
-      {showReceipt && <DigitalReceipt />}
+      {showReceipt && (
+        <DigitalReceipt
+          saleData={saleData}
+          items={selectedItems.map(i => ({ name: i.name, sale_price: i.sale_price, qty: (i as any).qty }))}
+          onClose={() => setShowReceipt(false)}
+        />
+      )}
 
       {/* Header */}
       <div className="border-b border-gray-100 px-8 py-6 bg-gray-50/50">
@@ -134,21 +150,32 @@ export default function SalesInterface() {
 
         {step === 2 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-            {/* Step 2 inputs as provided previously */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Customer Name</label>
-                <input type="text" name="customerName" placeholder="e.g. John Doe" className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 outline-none" onChange={handleInputChange} />
+                <input type="text" name="customerName" value={saleData.customerName} placeholder="e.g. John Doe" className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 outline-none" onChange={handleInputChange} />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Customer Phone</label>
+                <input type="tel" name="customerPhone" value={saleData.customerPhone} placeholder="+1234567890" className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 outline-none" onChange={handleInputChange} />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">IMEI *</label>
+                <input type="text" name="imei" value={saleData.imei} placeholder="123456789012345" className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 outline-none" onChange={handleInputChange} required />
               </div>
               <div className="sm:col-span-2 bg-blue-50/50 p-6 rounded-2xl border border-blue-100">
-                <label className="text-xs font-bold text-blue-600 uppercase tracking-widest flex items-center gap-1"><DollarSign size={14} /> Final Settled Price</label>
-                <input type="number" name="finalPrice" value={saleData.finalPrice} className="mt-2 w-full bg-transparent text-3xl font-black text-blue-700 outline-none" onChange={handleInputChange} />
+                <label className="text-xs font-bold text-blue-600 uppercase tracking-widest flex items-center gap-1"><DollarSign size={14} /> Final Settled Price *</label>
+                <input type="number" name="finalPrice" value={saleData.finalPrice} className="mt-2 w-full bg-transparent text-3xl font-black text-blue-700 outline-none" onChange={handleInputChange} required />
               </div>
-              {/* ... (IMEI, Phone, Notes inputs) ... */}
+              <div className="sm:col-span-2">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1"><MessageSquare size={12} /> Notes</label>
+                <textarea name="notes" value={saleData.notes} placeholder="Additional notes..." rows={3} className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 outline-none resize-none" onChange={handleInputChange} />
+              </div>
             </div>
+            {error && <div className="text-red-600 text-sm font-medium">{error}</div>}
             <div className="flex gap-3 pt-6 border-t border-gray-100">
-              <button onClick={() => setStep(1)} className="flex-1 rounded-xl border border-gray-200 py-4 font-bold text-gray-500 hover:bg-gray-50 transition">Back</button>
-              <button onClick={() => setStep(3)} className="flex-[2] rounded-xl bg-blue-600 py-4 font-bold text-white hover:bg-blue-700 shadow-lg transition-all">Complete Sale</button>
+              <button onClick={() => setStep(1)} className="flex-1 rounded-xl border border-gray-200 py-4 font-bold text-gray-500 hover:bg-gray-50 transition" disabled={submitting}>Back</button>
+              <button onClick={handleCompleteSale} className="flex-[2] rounded-xl bg-blue-600 py-4 font-bold text-white hover:bg-blue-700 shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled={submitting || !saleData.imei || !saleData.finalPrice}>{submitting ? "Processing..." : "Complete Sale"}</button>
             </div>
           </div>
         )}

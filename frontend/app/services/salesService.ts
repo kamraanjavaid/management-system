@@ -1,6 +1,6 @@
 import { Sale, CreateSaleDto } from '../types/sales-types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 class SalesService {
   private getHeaders() {
@@ -12,27 +12,30 @@ class SalesService {
   }
 
   async createSale(saleData: CreateSaleDto): Promise<Sale> {
-    const response = await fetch(`${API_URL}/sales`, {
+    const response = await fetch(`${API_URL}/api/sales`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify(saleData),
     });
+    if (!response.ok) throw new Error('Failed to create sale');
     return response.json();
   }
 
   async getAllSales(): Promise<Sale[]> {
-    const response = await fetch(`${API_URL}/sales`, {
+    const response = await fetch(`${API_URL}/api/sales`, {
       method: 'GET',
       headers: this.getHeaders(),
     });
+    if (!response.ok) throw new Error('Failed to fetch sales');
     return response.json();
   }
 
   async getSaleById(id: string): Promise<Sale> {
-    const response = await fetch(`${API_URL}/sales/${id}`, {
+    const response = await fetch(`${API_URL}/api/sales/${id}`, {
       method: 'GET',
       headers: this.getHeaders(),
     });
+    if (!response.ok) throw new Error('Failed to fetch sale');
     return response.json();
   }
 }
