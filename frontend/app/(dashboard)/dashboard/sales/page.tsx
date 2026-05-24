@@ -1,27 +1,41 @@
+"use client";
+
+import { useState } from "react";
+import { Plus, X } from "lucide-react";
 import SalesInterface from "@/app/components/dashboard/sales/SalesInterface";
 import RecentSalesTable from "@/app/components/dashboard/sales/RecentSalesTable";
 
 export default function SalesPage() {
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">New Sale / Counter</h1>
-        <div className="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
-          Counter Active: {new Date().toLocaleDateString()}
-        </div>
+        <h1 className="text-3xl font-bold text-gray-900">Sales</h1>
+        <button
+          onClick={() => setShowModal(true)}
+          className="flex items-center gap-2 bg-blue-600 hover:cursor-pointer hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-semibold text-sm transition shadow"
+        >
+          <Plus size={18} />
+          Add New Sale
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Left: The Sale Entry Form */}
-        <div className="xl:col-span-2">
-          <SalesInterface />
-        </div>
+      <RecentSalesTable />
 
-        {/* Right: History of sales for today */}
-        <div className="xl:col-span-1">
-          <RecentSalesTable />
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-4 right-4 z-10 p-1.5 bg-white rounded-full shadow hover:bg-gray-100 transition"
+            >
+              <X size={18} className="text-gray-600" />
+            </button>
+            <SalesInterface />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
