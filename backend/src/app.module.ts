@@ -7,6 +7,7 @@ import { HealthModule } from './health/health.module';
 import { AuthModule } from './auth/auth.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { SalesModule } from './sales/sales.module';
+import { MigrationModule } from './migrations/migration.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { SalesModule } from './sales/sales.module';
       isGlobal: true,
     }),
     SupabaseModule,
+    MigrationModule,
     HealthModule,
     AuthModule,
     InventoryModule,
