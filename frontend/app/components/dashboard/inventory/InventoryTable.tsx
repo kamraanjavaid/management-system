@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { inventoryService, Product } from '@/app/services/inventoryService';
+import { inventoryService } from '@/app/services/inventoryService';
+import { Product } from '@/app/types/inventory-types';
 import { Pencil, Trash2 } from 'lucide-react';
 import DeleteModal from '@/app/components/models/deleteModal';
 import ProductModal from './productModal'; // Rename your add modal to this

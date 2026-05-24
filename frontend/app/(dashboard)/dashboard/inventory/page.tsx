@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import InventoryTable from '@/app/components/dashboard/inventory/InventoryTable';
 import ProductModal from '@/app/components/dashboard/inventory/productModal';
 import ProtectedRoute from '@/app/components/auth/ProtectedRoute';
-import { inventoryService, Product } from '@/app/services/inventoryService';
+import { inventoryService } from '@/app/services/inventoryService';
 
 export default function InventoryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);

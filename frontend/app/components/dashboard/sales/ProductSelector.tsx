@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Search, Smartphone, Check, Plus } from "lucide-react";
-import { Product } from "@/app/services/inventoryService";
+import { Product } from "@/app/types/inventory-types";
 import Loading from "@/app/loader";
 
 interface ProductSelectorProps {
