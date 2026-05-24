@@ -22,7 +22,7 @@ export default function InventoryPage() {
     try {
       const products = await inventoryService.getAllProducts();
       const totalItems = products.reduce((sum, p) => sum + p.stock, 0);
-      const lowStockAlerts = products.filter(p => p.stock < 10).length;
+      const lowStockAlerts = products.filter(p => p.stock < 5).length;
       const inventoryValue = products.reduce((sum, p) => sum + (p.cost_price * p.stock), 0);
       
       setStats({
