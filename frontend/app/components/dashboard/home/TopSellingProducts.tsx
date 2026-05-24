@@ -63,7 +63,7 @@ export default function TopSellingProducts() {
                 <p className="text-sm font-medium text-slate-700">{item.name}</p>
                 <div className="text-right">
                   <p className="text-sm font-bold text-slate-900">
-                    ${item.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {item.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                   <p className="text-[10px] text-slate-400">{item.sold} sold</p>
                 </div>

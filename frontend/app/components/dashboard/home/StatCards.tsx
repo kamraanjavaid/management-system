@@ -21,7 +21,7 @@ export default function StatCards() {
         salesService.getAllSales(),
       ]);
       const totalItems = products.reduce((sum, p) => sum + (p.stock || 0), 0);
-      const lowStockAlerts = products.filter(p => p.stock < 10).length;
+      const lowStockAlerts = products.filter(p => p.stock < 5).length;
       const inventoryValue = products.reduce((sum, p) => sum + ((p.cost_price || 0) * (p.stock || 0)), 0);
       const totalSalesCount = sales.length;
       const totalSalesValue = sales.reduce((sum, s) => sum + Number(s.final_settled_price), 0);
@@ -39,7 +39,7 @@ export default function StatCards() {
   const statsConfig = [
     { 
       label: "Sales Value", 
-      value: `$${data.totalSalesValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: `${data.totalSalesValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: <DollarSign className="text-emerald-600" />, 
       bgColor: "bg-emerald-50" 
     },
@@ -51,7 +51,7 @@ export default function StatCards() {
     },
     { 
       label: "Inventory Value", 
-      value: `${data.inventoryValue.toLocaleString()} PKR`,
+      value: `${data.inventoryValue.toLocaleString()}`,
       icon: <Package className="text-cyan-600" />, 
       bgColor: "bg-cyan-50" 
     },

@@ -93,7 +93,7 @@ export default function RecentSalesTable() {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-500">Filtered Revenue</p>
-            <p className="text-2xl font-bold text-emerald-600">${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+            <p className="text-2xl font-bold text-emerald-600">{totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
           </div>
         </div>
       </div>
@@ -185,7 +185,7 @@ export default function RecentSalesTable() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <span className="text-sm font-bold text-gray-900">
-                      ${Number(sale.final_settled_price).toFixed(2)}
+                      {Number(sale.final_settled_price).toFixed(2)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-center">
