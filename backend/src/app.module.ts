@@ -7,6 +7,7 @@ import { HealthModule } from './health/health.module';
 import { AuthModule } from './auth/auth.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { SalesModule } from './sales/sales.module';
+import { RepairsModule } from './repairs/repairs.module';
 import { MigrationModule } from './migrations/migration.module';
 
 @Module({
@@ -20,6 +21,7 @@ import { MigrationModule } from './migrations/migration.module';
     AuthModule,
     InventoryModule,
     SalesModule,
+    RepairsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
